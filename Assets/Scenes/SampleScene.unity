@@ -2880,7 +2880,7 @@ MonoBehaviour:
     type: 3}
   fireInterval: 1
   detectionRange: 15
-  rotateSpeed: 70
+  rotateSpeed: 1000
 --- !u!1 &1932078252
 GameObject:
   m_ObjectHideFlags: 0
@@ -3495,6 +3495,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 6798565653989553201}
+    - targetCorrespondingSourceObject: {fileID: 1550383145148193301, guid: 4840cd3faf5dc974c9d239f843ddbefd,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6798565653989553213}
   m_SourcePrefab: {fileID: 100100000, guid: 4840cd3faf5dc974c9d239f843ddbefd, type: 3}
 --- !u!1 &6798565653989553200 stripped
 GameObject:
@@ -3523,6 +3527,18 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 6798565653989553199}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &6798565653989553213
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6798565653989553200}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 136d7f398e2674347a7b35608b343d64, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
