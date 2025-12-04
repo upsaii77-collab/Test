@@ -4,23 +4,24 @@ public class EnemyTimeController : MonoBehaviour
 {
     public static EnemyTimeController Instance;
 
-    float gauge = 0;
+    float slowRatio = 1f;
 
     void Awake()
     {
         Instance = this;
     }
 
-    public void SetGauge(float value)
+    public void SetGauge(float gauge)
     {
-        gauge = value;
+        // 0~100 게이지를 1~0 비율로 변환
+        slowRatio = 1f - (gauge / 100f);
 
-        float slowRatio = 1f - (gauge / 100f); // 1=정상, 0=정지
+        // 씬 안에 있는 모든 EnemyMove 에 적용
+        EnemyMove[] enemies = FindObjectsOfType<EnemyMove>();
 
-        foreach (EnemyMove enemy in FindObjectsOfType<EnemyMove>())
+        foreach (EnemyMove e in enemies)
         {
-            enemy.SetSlowRatio(slowRatio);
+            e.SetSlowRatio(slowRatio);
         }
     }
 }
-

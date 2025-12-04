@@ -3,7 +3,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 
 public class GearWeapon : MonoBehaviour
 {
-    public Transform trackHand;
+    public Transform trackHand;          // 실제 손(컨트롤러)의 위치
     public float increaseRate = 25f;
     public float decreaseRate = 12f;
     public float threshold = 1.2f;
@@ -18,34 +18,33 @@ public class GearWeapon : MonoBehaviour
     {
         grab = GetComponent<XRGrabInteractable>();
 
+        // === 잡았을 때 ===
         grab.selectEntered.AddListener((args) =>
         {
             isHeld = true;
 
-            var interactor = args.interactorObject as XRBaseInteractor;
+            // XRBaseInteractor 가져오기
+            XRBaseInteractor interactor = args.interactorObject as XRBaseInteractor;
 
-            if (interactor != null)
+            if (interactor == null)
             {
-                // 우선 attachTransform 사용
-                trackHand = interactor.attachTransform;
-
-                // attachTransform이 null일 경우 interactor.transform 사용 (안전장치)
-                if (trackHand == null)
-                {
-                    Debug.LogWarning("⚠ attachTransform is NULL. Using interactor.transform instead.");
-                    trackHand = interactor.transform;
-                }
-            }
-            else
-            {
-                Debug.LogError("❌ 인터랙터 정보를 가져올 수 없습니다!");
+                Debug.LogError("❌ interactorObject is NOT XRBaseInteractor!");
                 isHeld = false;
                 return;
             }
 
+            // 1) attachTransform은 '무기 잡는 위치'용 → 실제 컨트롤러 위치 아님
+            Transform attach = interactor.GetAttachTransform(grab);
+
+            // 2) 실제 손(컨트롤러 transform)만 트래킹해야 함
+            trackHand = interactor.transform;
+
+            Debug.Log($"📌 Track Hand = {trackHand.name} (Controller Transform 사용)");
+
             prevPos = trackHand.position;
         });
 
+        // === 놓았을 때 ===
         grab.selectExited.AddListener((args) =>
         {
             isHeld = false;
@@ -55,22 +54,27 @@ public class GearWeapon : MonoBehaviour
 
     void Update()
     {
-        // 💥 가장 중요한 안전검사 (Update 초입에서 실행)
+        // -------------------------
+        // 무기를 들고 있지 않을 때
+        // -------------------------
         if (!isHeld || trackHand == null)
         {
             gauge -= decreaseRate * Time.deltaTime;
             gauge = Mathf.Clamp(gauge, 0, 100);
 
-            if (EnemyTimeController.Instance != null)
-                EnemyTimeController.Instance.SetGauge(gauge);
-
+            EnemyTimeController.Instance?.SetGauge(gauge);
             return;
         }
 
-        // 손 속도 계산
+        // -------------------------
+        // 손(컨트롤러) 속도 계산
+        // -------------------------
         float speed = (trackHand.position - prevPos).magnitude / Time.deltaTime;
         prevPos = trackHand.position;
 
+        // -------------------------
+        // 게이지 계산
+        // -------------------------
         if (speed > threshold)
             gauge += increaseRate * Time.deltaTime;
         else
@@ -78,9 +82,10 @@ public class GearWeapon : MonoBehaviour
 
         gauge = Mathf.Clamp(gauge, 0, 100);
 
-        if (EnemyTimeController.Instance != null)
-            EnemyTimeController.Instance.SetGauge(gauge);
+        // 적 시간 조절
+        EnemyTimeController.Instance?.SetGauge(gauge);
 
-            Debug.Log("Gauge: " + gauge);
+        // 디버그
+        Debug.Log($"Gauge: {gauge:F2}  |  Speed: {speed:F2}");
     }
 }
