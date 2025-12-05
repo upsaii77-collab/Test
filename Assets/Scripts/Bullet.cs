@@ -5,8 +5,8 @@ public class Bullet : MonoBehaviour
     public float speed = 20f;
     public float lifeTime = 2f;
 
-    public string targetTag;
-    public Color bulletColor;
+    public string targetTag;  // 이 총알이 맞출 적의 태그
+    public Color bulletColor; // 총알 색상
 
     private float timer;
     private Renderer rend;
@@ -25,13 +25,13 @@ public class Bullet : MonoBehaviour
     {
         timer = 0f;
         // ApplyColor는 WeaponShoot에서 호출됨
+        ApplyColor();  // 총알 색상 적용
     }
 
+    // 총알 색상 적용 함수
     public void ApplyColor()
     {
         if (mat == null) return;
-
-        // 기본 색상만 적용 (Emission 제거)
         mat.color = bulletColor;
     }
 
@@ -50,11 +50,19 @@ public class Bullet : MonoBehaviour
     {
         if (other.CompareTag(targetTag))
         {
-            Destroy(other.gameObject);
+            // 총알이 맞은 적에게 체력 감소
+            EnemyMove enemy = other.GetComponent<EnemyMove>();
+            if (enemy != null)
+            {
+                enemy.TakeDamage(50f);  // 피해량은 50으로 설정, 필요에 따라 조정 가능
+            }
+
+            // 총알 삭제 및 풀로 반환
             ObjectPool.Instance.ReturnToPool(gameObject);
         }
     }
 }
+
 
 
 
