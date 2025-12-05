@@ -5,19 +5,40 @@ public class Bullet : MonoBehaviour
     public float speed = 20f;
     public float lifeTime = 2f;
 
+    public string targetTag;
+    public Color bulletColor;
+
     private float timer;
+    private Renderer rend;
+    private Material mat;
+
+    private void Awake()
+    {
+        rend = GetComponent<Renderer>();
+
+        // Prefab 전체에 영향 주지 않도록 material 복사
+        if (rend != null)
+            mat = rend.material;
+    }
 
     private void OnEnable()
     {
         timer = 0f;
+        // ApplyColor는 WeaponShoot에서 호출됨
+    }
+
+    public void ApplyColor()
+    {
+        if (mat == null) return;
+
+        // 기본 색상만 적용 (Emission 제거)
+        mat.color = bulletColor;
     }
 
     void Update()
     {
-        // 총알 이동
         transform.position += transform.forward * speed * Time.deltaTime;
 
-        // 일정 시간 지나면 자동 반환
         timer += Time.deltaTime;
         if (timer >= lifeTime)
         {
@@ -27,16 +48,13 @@ public class Bullet : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        // Enemy 태그가 붙은 적에 맞았을 때
-        if (other.CompareTag("Enemy"))
+        if (other.CompareTag(targetTag))
         {
-            Destroy(other.gameObject); // 적 삭제
-            ObjectPool.Instance.ReturnToPool(gameObject); // 총알 풀로 반환
+            Destroy(other.gameObject);
+            ObjectPool.Instance.ReturnToPool(gameObject);
         }
     }
 }
-
-
 
 
 
